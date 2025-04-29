@@ -150,6 +150,53 @@ def remove_favourite():
 
     return redirect(url_for('home'))
 
+@app.route('/alerts', methods=['GET', 'POST'])
+@login_required
+def alerts():
+    # Handle alert creation
+    if request.method == 'POST':
+        flight_number = request.form['flight_number']
+        condition_type = request.form['condition_type']
+        threshold = request.form['threshold']
+
+        new_alert = FlightAlert(
+            user_id=current_user.id,
+            flight_number=flight_number,
+            condition_type=condition_type,
+            threshold=threshold,
+            triggered=False
+        )
+        db.session.add(new_alert)
+        db.session.commit()
+
+        return redirect(url_for('alerts'))
+
+    # Get all user's alerts
+    user_alerts = FlightAlert.query.filter_by(user_id=current_user.id).all()
+
+    # Fetch live data from OpenSky API
+    url = 'https://opensky-network.org/api/states/all'
+    response = requests.get(url).json()
+    flights = response.get('states', [])
+
+    for alert in user_alerts:
+        if alert.triggered:
+            continue
+
+        for flight_data in flights:
+            callsign = flight_data[1].strip() if flight_data[1] else None
+            if callsign == alert.flight_number:
+                if alert.condition_type == "altitude_below":
+                    altitude = flight_data[13]
+                    if altitude is not None and float(altitude) < float(alert.threshold):
+                        alert.triggered = True
+                elif alert.condition_type == "on_ground":
+                    if flight_data[8]:  # On ground is True
+                        alert.triggered = True
+                break  # No need to check more flights once matched
+
+    db.session.commit()
+    return render_template('alerts.html', alerts=user_alerts)
 
 
 if __name__ == '__main__':
