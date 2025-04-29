@@ -7,10 +7,22 @@
 </head>
 <body>
     <h2>✈️ Live Flights (from OpenSky API)</h2>
+    {% if pending_alerts %}
+    <div style="background-color: #ffefc1; padding: 15px; margin-bottom: 20px; border-left: 5px solid orange;">
+        <strong>🔔 Flight Alerts:</strong>
+        <ul>
+            {% for alert in pending_alerts %}
+                <li>Tracking flight <strong>{{ alert.flight_number }}</strong> ({{ alert.condition_type }} {{ alert.threshold }})</li>
+            {% endfor %}
+        </ul>
+        <a href="{{ url_for('alerts') }}">Manage Alerts</a>
+    </div>
+{% endif %}
 
     <!-- Navigation Links -->
     <div>
         <a href="{{ url_for('favourites') }}">❤️ View My Favourites</a> |
+        <a href="{{ url_for('alerts') }}">🔔 Add Alert</a> |
         <a href="{{ url_for('logout') }}">🔒 Log out</a>
     </div>
     <br>
