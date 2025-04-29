@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Favourite Flights</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>❤️ My Favourite Flights</h2>
+
+    <!-- Refresh Button -->
+    <form method="POST" action="{{ url_for('favourites') }}">
+        <button type="submit">🔄 Refresh</button>
+    </form>
+    <br>
+
+    {% if favourites %}
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Flight Number</th>
+                    <th>Origin Country</th>
+                    <th>Altitude (m)</th>
+                    <th>Speed (m/s)</th>
+                    <th>On Ground</th>
+                    <th>Remove</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flight in favourites %}
+                <tr>
+                    <td>{{ flight.flight_number }}</td>
+                    <td>{{ flight.airline }}</td>  <!-- origin_country -->
+                    <td>{{ flight.aircraft_type }}</td>  <!-- altitude -->
+                    <td>{{ flight.departure_airport }}</td>  <!-- speed -->
+                    <td>{{ flight.arrival_airport }}</td>  <!-- on_ground -->
+                    <td>
+                        <form action="{{ url_for('remove_favourite') }}" method="POST">
+                            <input type="hidden" name="flight_number" value="{{ flight.flight_number }}">
+                            <button type="submit">🗑 Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>You haven't added any favourite flights yet.</p>
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('home') }}">⬅ Back to Home</a><br>
+    <a href="{{ url_for('logout') }}">Log out</a>
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FlightRadar Insights – Home</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>✈️ Live Flights (from OpenSky API)</h2>
+
+    <!-- Navigation Links -->
+    <div>
+        <a href="{{ url_for('favourites') }}">❤️ View My Favourites</a> |
+        <a href="{{ url_for('logout') }}">🔒 Log out</a>
+    </div>
+    <br>
+
+    <!-- Refresh Button -->
+    <form method="POST">
+        <button type="submit">🔄 Refresh</button>
+    </form>
+
+    {% if flights %}
+        <table border="1" style="margin-top:20px;">
+            <thead>
+                <tr>
+                    <th>Flight Number</th>
+                    <th>Origin Country</th>
+                    <th>Altitude (m)</th>
+                    <th>Speed (m/s)</th>
+                    <th>On Ground</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for flight in flights %}
+                <tr>
+                    <td>{{ flight.flight_number }}</td>
+                    <td>{{ flight.origin_country }}</td>
+                    <td>{{ flight.altitude }}</td>
+                    <td>{{ flight.speed }}</td>
+                    <td>{{ flight.on_ground }}</td>
+                    <td>
+                        <form action="{{ url_for('add_favourite') }}" method="POST" style="display:inline;">
+                            <input type="hidden" name="flight_number" value="{{ flight.flight_number }}">
+                            <input type="hidden" name="airline" value="{{ flight.origin_country }}">
+                            <input type="hidden" name="aircraft_type" value="{{ flight.altitude }}">
+                            <input type="hidden" name="departure_airport" value="{{ flight.speed }}">
+                            <input type="hidden" name="arrival_airport" value="{{ flight.on_ground }}">
+                            <button type="submit">❤️ Add</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>Click "Refresh" to load flight data.</p>
+    {% endif %}
+</body>
+</html>
