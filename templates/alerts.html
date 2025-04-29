@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>FlightRadar Alerts</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <h2>🔔 Manage Alerts</h2>
+
+    <!-- Navigation -->
+    <div>
+        <a href="{{ url_for('home') }}">🏠 Home</a> |
+        <a href="{{ url_for('favourites') }}">❤️ View Favourites</a> |
+        <a href="{{ url_for('logout') }}">🔒 Log out</a>
+    </div>
+    <br>
+
+    <!-- Add Alert Form -->
+    <form method="POST" action="{{ url_for('alerts') }}">
+        <label for="flight_number">Flight Number:</label>
+        <input type="text" id="flight_number" name="flight_number" required>
+
+        <label for="condition_type">Condition Type:</label>
+        <select id="condition_type" name="condition_type" required>
+            <option value="altitude_below">Altitude Below</option>
+            <option value="on_ground">Is On Ground</option>
+        </select>
+
+        <label for="threshold">Threshold:</label>
+        <input type="number" id="threshold" name="threshold" required>
+
+        <button type="submit">➕ Add Alert</button>
+    </form>
+
+    <br><hr><br>
+
+    <!-- Active Alerts Table -->
+    {% if alerts %}
+        <table border="1" style="margin-top:20px;">
+            <thead>
+                <tr>
+                    <th>Flight Number</th>
+                    <th>Condition</th>
+                    <th>Threshold</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for alert in alerts %}
+                    {% if not alert.triggered %}
+                    <tr>
+                        <td>{{ alert.flight_number }}</td>
+                        <td>{{ alert.condition_type }}</td>
+                        <td>{{ alert.threshold }}</td>
+                    </tr>
+                    {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No active alerts present.</p>
+    {% endif %}
+</body>
+</html>
